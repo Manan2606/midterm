@@ -11,6 +11,7 @@ import logging
 import logging.config
 import pandas as pd
 from dotenv import load_dotenv
+from tabulate import tabulate
 from app.command import CommandHandler
 from app.pluggin.add import AddCommand
 from app.pluggin.subtract import SubtractCommand
@@ -20,7 +21,7 @@ from app.pluggin.mean import MeanCommand
 from app.pluggin.median import MedianCommand
 from app.pluggin.standard_deviation import StandardDeviationCommand
 from app.pluggin.history import HistoryCommand
-from tabulate import tabulate
+
 
 class App:
     """Main application class to manage command execution."""
@@ -86,15 +87,15 @@ class App:
         command = parts[0]
         args = parts[1:]
 
+        # pylint: disable=unnecessary-dunder-call, invalid-name
         if command in self.command_handler.commands:
             try:
                 result = self.command_handler.execute_command(command, *args)
                 print(result)
-
-                # Add the command to history
                 history_command = self.command_handler.commands.get("history")
                 history_command.add_to_history(cmd_input)
 
+            # pylint: disable=broad-exception-caught
             except Exception as e:
                 logging.error("Error executing command: %s", e)
                 print(f"Error: {e}")
@@ -112,7 +113,7 @@ class App:
             except ValueError:
                 logging.error("Invalid input for numbers.")
                 print("Please enter valid numbers.")
-                
+
     def show_history(self):
         """Display the history of commands using tabulate for a table-like format."""
         if self.history_df.empty:

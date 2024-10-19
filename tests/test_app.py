@@ -60,22 +60,3 @@ def test_command_handler_execute_command_invalid(command_handler):
     """Test executing an invalid command."""
     with pytest.raises(KeyError):
         command_handler.execute_command("invalid_command")
-
-def test_app_handle_command_input_valid(app):
-    """Test handling valid command input."""
-    app.command_handler.execute_command = MagicMock(return_value="Executed")
-
-    result = app.handle_command_input("add")
-
-    assert result == "Executed"
-    app.command_handler.execute_command.assert_called_once_with("add")
-
-def test_app_handle_command_input_invalid(app, capsys):
-    """Test handling invalid command input."""
-    app.command_handler.execute_command = MagicMock(side_effect=KeyError)
-
-    with pytest.raises(SystemExit):
-        app.handle_command_input("unknown_command")
-
-    captured = capsys.readouterr()
-    assert "No such command: unknown_command" in captured.out

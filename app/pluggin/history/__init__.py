@@ -3,14 +3,13 @@
 This module contains the implementation of the HistoryCommand class,
 which retrieves and displays the history of executed commands.
 """
-
-from app.command import Command
 import pandas as pd
 from tabulate import tabulate
+from app.command import Command
 
 class HistoryCommand(Command):
     """Command class to display history of past commands."""
-    
+
     def __init__(self, history_df):
         """Initialize with a DataFrame to store the command history."""
         self.history_df = history_df
@@ -27,9 +26,11 @@ class HistoryCommand(Command):
         """Display the history of commands using tabulate for a table-like format."""
         if self.history_df.empty:
             return "No command history available."
-        else:
-            # Use tabulate to create a nicely formatted table
-            return tabulate(self.history_df.values, headers=["Command"], tablefmt="fancy_grid")
+
+        # Use tabulate to format the DataFrame
+        return tabulate(self.history_df.values, headers=["Command"], tablefmt="fancy_grid")
+
+
 
     def add_to_history(self, command_str):
         """Add a new command to the history."""
