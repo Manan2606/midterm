@@ -9,6 +9,7 @@ import os
 import sys
 import logging
 import logging.config
+import pandas as pd
 from dotenv import load_dotenv
 from app.command import CommandHandler
 from app.pluggin.add import AddCommand
@@ -18,19 +19,21 @@ from app.pluggin.divide import DivideCommand
 from app.pluggin.mean import MeanCommand
 from app.pluggin.median import MedianCommand
 from app.pluggin.standard_deviation import StandardDeviationCommand
-
+from app.pluggin.history import HistoryCommand
+from tabulate import tabulate
 
 class App:
     """Main application class to manage command execution."""
 
     def __init__(self):
         """Initialize the application, configure logging, and load environment variables."""
-        os.makedirs('logs', exist_ok=True)  # Ensure the logs directory exists
+        os.makedirs('logs', exist_ok=True)
         self.configure_logging()
-        load_dotenv()  # Load environment variables from .env file
-        self.settings = dict(os.environ)  # Use dict instead of comprehension
-        self.settings.setdefault('ENVIRONMENT', 'PRODUCTION')  # Set default environment
-        self.command_handler = CommandHandler()  # Initialize command handler
+        load_dotenv()
+        self.settings = dict(os.environ)
+        self.settings.setdefault('ENVIRONMENT', 'PRODUCTION')
+        self.command_handler = CommandHandler()
+        self.history_df = pd.DataFrame(columns=["Command"])  # Initialize an empty DataFrame for history
         self.register_commands()
 
     def configure_logging(self):
@@ -61,6 +64,7 @@ class App:
         self.command_handler.register_command("mean", MeanCommand())
         self.command_handler.register_command("median", MedianCommand())
         self.command_handler.register_command("standard_deviation", StandardDeviationCommand())
+        self.command_handler.register_command("history", HistoryCommand(self.history_df))
 
     def display_menu(self):
         """Display available commands in the menu."""
@@ -72,17 +76,31 @@ class App:
         print("5. mean                       - Calculate mean of provided numbers")
         print("6. median                     - Calculate median of provided numbers")
         print("7. standard_deviation         - Calculate standard deviation of provided numbers")
+        print("8. history                    - History of maximum 10 commands")
         print("Type 'exit' to exit the application.")
+        print("Dummy Format: add 3 4")
 
     def handle_command_input(self, cmd_input):
         """Handle the execution of commands based on user input."""
-        if cmd_input in self.command_handler.commands:
-            # Command execution logic...
-            return self.command_handler.execute_command(cmd_input)  # Add return here for command result
+        parts = cmd_input.split()
+        command = parts[0]
+        args = parts[1:]
 
-        logging.error("Unknown command: %s", cmd_input)  # Use lazy logging
-        print(f"No such command: {cmd_input}")
-        raise SystemExit  # Raise SystemExit when encountering an unknown command
+        if command in self.command_handler.commands:
+            try:
+                result = self.command_handler.execute_command(command, *args)
+                print(result)
+
+                # Add the command to history
+                history_command = self.command_handler.commands.get("history")
+                history_command.add_to_history(cmd_input)
+
+            except Exception as e:
+                logging.error("Error executing command: %s", e)
+                print(f"Error: {e}")
+        else:
+            logging.error("Unknown command: %s", command)
+            print(f"No such command: {command}")
 
     def get_float_input(self, prompt, is_multiple=False):
         """Get float input from the user."""
@@ -94,6 +112,15 @@ class App:
             except ValueError:
                 logging.error("Invalid input for numbers.")
                 print("Please enter valid numbers.")
+                
+    def show_history(self):
+        """Display the history of commands using tabulate for a table-like format."""
+        if self.history_df.empty:
+            print("No command history available.")
+        else:
+            # Use tabulate to create a nicely formatted table
+            print("\nCommand History:")
+            print(tabulate(self.history_df.values, headers=["Command"], tablefmt="fancy_grid"))
 
     def start(self):
         """Start the REPL for command input."""
@@ -114,7 +141,6 @@ class App:
             logging.info("Application interrupted and exiting gracefully.")
         finally:
             logging.info("Application shutdown.")
-
 
 if __name__ == "__main__":
     app = App()
