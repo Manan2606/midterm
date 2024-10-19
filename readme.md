@@ -5,13 +5,16 @@
 ### Table of Contents
 - [Overview](#overview)
 - [Features](#features)
-- [Design Patterns](#design-patterns)
-- [Logging Strategy](#logging-strategy)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Commands](#commands)
+- [Design Patterns](#design-patterns)
+- [Environment Variables](#environment-variables)
+- [Logging](#logging)
+- [Error Handling](#error-handling)
 - [Testing](#testing)
 - [Contributing](#contributing)
+- [Video Demonstration](#video-demonstration)
 
 ### Overview
 This project is an advanced calculator application developed in Python. It supports various mathematical operations and includes features such as command history management, dynamic plugin architecture, and data analysis capabilities using the Pandas library. The application provides a user-friendly REPL (Read-Eval-Print Loop) interface for interactive calculations.
@@ -26,21 +29,21 @@ This project is an advanced calculator application developed in Python. It suppo
 
 ### Design Patterns
 This application utilizes several design patterns to enhance modularity and maintainability:
+- **Command Pattern**: Encapsulates command requests as objects, allowing for parameterization and queuing of requests, while supporting undoable operations.
+- **Strategy Pattern**: Implements a family of algorithms (arithmetic operations) and makes them interchangeable within the command structure.
+- **Facade Pattern**: Simplifies interactions with complex subsystems (like command handling and history management) through a unified interface.
 
-- **Command Pattern**: Encapsulates command requests as objects, allowing for parameterization and queuing of requests, while supporting undoable operations. This pattern is implemented through the `CommandHandler` class, which dynamically manages command execution and history.
-
-- **Strategy Pattern**: Implements a family of algorithms (arithmetic operations) and makes them interchangeable within the command structure. Each mathematical operation is encapsulated in its own command class, promoting separation of concerns.
-
-- **Facade Pattern**: Simplifies interactions with complex subsystems (like command handling and history management) through a unified interface. The `App` class serves as a facade, providing a single entry point for command execution and user interaction.
-
+## Design Patterns Documentation
 For a detailed explanation of the design patterns used in this project, including their rationale and implementation details, please refer to the [Design Patterns Documentation](./design_patterns_documentation.md).
 
-### Logging Strategy
-The application employs a robust logging strategy to facilitate troubleshooting and monitor application behavior:
+### Environment Variables
+The application uses environment variables to configure settings. The `load_environment_variables` method loads these variables, ensuring that sensitive information remains secure. For details, see [this method](app/__init__.py).
 
-- **Logging Configuration**: Configured using a logging configuration file or basic configuration as a fallback. Logs are written to a file (`logs/app.log`) and can also be viewed in the console.
+### Logging
+Logging is implemented to track application behavior and errors. The `configure_logging` method sets up logging configurations. See the implementation [here](app/__init__.py).
 
-- **Log Levels**: Different log levels (INFO, ERROR) are used throughout the application to capture key events and errors, allowing for effective debugging and operational transparency.
+### Error Handling
+The application employs error handling strategies, including try/catch blocks to manage exceptions effectively. This implementation follows the principles of "Look Before You Leap" (LBYL) and "Easier to Ask for Forgiveness than Permission" (EAFP). For more information, refer to [this section](app/__init__.py).
 
 ### Installation
 To set up the Advanced Python Calculator application, follow these steps:
@@ -82,3 +85,7 @@ pytest --pylint --cov
 ### Contributing
 
 Contributions are welcome! Please feel free to submit a pull request or open an issue for any bugs or feature requests.
+
+### Video Demonstration
+
+Watch the video demonstration of the calculator showcasing its key features and functionalities here.
