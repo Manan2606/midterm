@@ -29,7 +29,7 @@ class HistoryCommand(Command):
         if command == "clear":
             return self.clear_history()
         if command == "delete":
-            return self.delete_history()
+            return self.delete_history(args[1] if len(args) > 1 else "history.csv")  # Pass filename if provided
 
         return "Invalid history command. Available commands: show, save, load, clear, delete."
 

@@ -45,13 +45,22 @@ class App:
             print(history_command.load_history("history.csv"))  # Load history automatically on startup
 
     def configure_logging(self):
-        """Configure logging for the application."""
-        logging_conf_path = 'logging.conf'
+        """Configure logging for the application from a config file."""
+        logging_conf_path = 'logging.conf'  # Path to your logging config file
+
         if os.path.exists(logging_conf_path):
             logging.config.fileConfig(logging_conf_path, disable_existing_loggers=False)
+            logging.info("Logging configured from file: %s", logging_conf_path)
         else:
-            logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-        logging.info("Logging configured.")
+            logging.basicConfig(
+                level=logging.INFO,
+                format='%(asctime)s - %(levelname)s - %(message)s',
+                handlers=[
+                    logging.FileHandler('logs/app.log'),  # Fallback if config file does not exist
+                    logging.StreamHandler()
+                ]
+            )
+            logging.info("Default logging configuration applied.")
 
     def load_environment_variables(self):
         """Load environment variables into the application's settings."""
