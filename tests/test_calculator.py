@@ -1,4 +1,5 @@
 '''test_calculator.py'''
+import os
 import pytest
 import pandas as pd
 from app.pluggin.add import AddCommand
@@ -233,24 +234,51 @@ def test_stddev_command_with_no_input(stddev_command):
     result = stddev_command.execute()
     assert result == "Please provide at least one number to calculate the standard deviation."
 
-
+# History command
 @pytest.fixture
 def history_command():
     """Fixture to create an instance of HistoryCommand for testing."""
     history_df = pd.DataFrame(columns=["Command"])
     return HistoryCommand(history_df)
 
+
+# 1. Test empty history
 def test_empty_history(history_command):
     """Test the case when no command history is available."""
     result = history_command.execute()
     assert result == "No command history available."
 
-def test_add_to_history(history_command):
-    """Test adding a command to history."""
+
+# 2. Test adding an empty command
+def test_add_empty_command(history_command):
+    """Test adding an empty command to history."""
+    history_command.add_to_history("")
+    result = history_command.show_history()
+    assert "" in result  # Ensure empty command is stored
+    assert "No command history available." not in result
+
+
+# 3. Test adding a single command
+def test_add_single_command(history_command):
+    """Test adding a single command to history."""
     history_command.add_to_history("add 2 3")
     assert history_command.history_df.iloc[0]["Command"] == "add 2 3"
     assert len(history_command.history_df) == 1
 
+
+# 4. Test adding multiple commands
+def test_add_multiple_commands(history_command):
+    """Test adding multiple commands to history."""
+    commands = ["add 2 3", "subtract 5 2", "multiply 3 4"]
+    for command in commands:
+        history_command.add_to_history(command)
+
+    assert len(history_command.history_df) == 3
+    for idx, command in enumerate(commands):
+        assert history_command.history_df.iloc[idx]["Command"] == command
+
+
+# 5. Test showing the history of commands
 def test_show_history(history_command):
     """Test displaying the history of commands."""
     history_command.add_to_history("add 2 3")
@@ -259,19 +287,60 @@ def test_show_history(history_command):
     assert "add 2 3" in result
     assert "subtract 5 2" in result
 
-def test_multiple_commands(history_command):
-    """Test adding multiple commands to history."""
-    commands = ["multiply 3 4", "divide 8 2", "mean 1 2 3 4 5"]
-    for command in commands:
-        history_command.add_to_history(command)
 
-    result = history_command.show_history()
-    for command in commands:
-        assert command in result
+# 6. Test loading history from a non-existent file
+def test_load_history_file_not_found(history_command):
+    """Test loading history from a non-existent file."""
+    result = history_command.load_history("non_existent_file.csv")
+    assert result == "History file 'non_existent_file.csv' not found."
 
-def test_show_history_with_empty_command(history_command):
-    """Test showing history after adding an empty command."""
-    history_command.add_to_history("")
-    result = history_command.show_history()
-    assert "No command history available." not in result
-    assert "" in result  # Check that empty command is stored
+# 7. Test clearing the command history
+def test_clear_history(history_command):
+    """Test clearing the command history."""
+    history_command.add_to_history("add 2 3")
+    history_command.add_to_history("subtract 5 2")
+    result = history_command.clear_history()
+    assert result == "History cleared."
+    assert history_command.history_df.empty
+
+
+# 8. Test clearing the command history when it's empty
+def test_clear_empty_history(history_command):
+    """Test clearing the command history when it's already empty."""
+    result = history_command.clear_history()
+    assert result == "History cleared."
+    assert history_command.history_df.empty
+
+
+# 9. Test deleting a non-existent history file
+def test_delete_history_file_not_found(history_command):
+    """Test deleting a non-existent history file."""
+    result = history_command.delete_history("non_existent_file.csv")
+    assert result == "No history file found at 'non_existent_file.csv'."
+
+
+# 10. Test deleting the history file
+def test_delete_history(history_command, tmpdir):
+    """Test deleting the history file."""
+    filepath = tmpdir.join("history.csv")
+    pd.DataFrame([["add 2 3"]], columns=["Command"]).to_csv(filepath, index=False)
+
+    result = history_command.delete_history(str(filepath))
+    assert result == f"History file '{filepath}' deleted."
+    assert not os.path.exists(filepath)
+
+
+# 11. Test adding special characters as commands
+def test_add_special_characters(history_command):
+    """Test adding special characters as commands in the history."""
+    special_command = "!@#$%^&*()"
+    history_command.add_to_history(special_command)
+    assert history_command.history_df.iloc[0]["Command"] == special_command
+    assert special_command in history_command.show_history()
+
+
+# 12. Test invalid history command
+def test_invalid_history_command(history_command):
+    """Test an invalid subcommand for history."""
+    result = history_command.execute("invalid_command")
+    assert result == "Invalid history command. Available commands: show, save, load, clear, delete."

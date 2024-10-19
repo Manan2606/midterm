@@ -36,6 +36,13 @@ class App:
         self.command_handler = CommandHandler()
         self.history_df = pd.DataFrame(columns=["Command"])  # Initialize an empty DataFrame for history
         self.register_commands()
+        self.load_startup_history()
+
+    def load_startup_history(self):
+        """Optionally load history at startup from a CSV file."""
+        history_command = self.command_handler.commands.get("history")
+        if history_command:
+            print(history_command.load_history("history.csv"))  # Load history automatically on startup
 
     def configure_logging(self):
         """Configure logging for the application."""
