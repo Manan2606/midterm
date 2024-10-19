@@ -28,6 +28,10 @@ This application utilizes several design patterns to enhance modularity and main
 - **Strategy Pattern**: Implements a family of algorithms (arithmetic operations) and makes them interchangeable within the command structure.
 - **Facade Pattern**: Simplifies interactions with complex subsystems (like command handling and history management) through a unified interface.
 
+## Design Patterns Documentation
+
+For a detailed explanation of the design patterns used in this project, including their rationale and implementation details, please refer to the [Design Patterns Documentation](./design_patterns_documentation.md).
+
 ### Installation
 To set up the Advanced Python Calculator application, follow these steps:
 
@@ -37,6 +41,7 @@ To set up the Advanced Python Calculator application, follow these steps:
    cd <repository-directory>
 
 2. Install Dependencies : Once inside the project directory, install the required packages using pip. Make sure you have a requirements.txt file in your repository, which lists all the necessary dependencies.
+    
     pip install -r requirements.txt
 
 ### Usage
@@ -49,13 +54,17 @@ To set up the Advanced Python Calculator application, follow these steps:
 ### Commands
 
 Basic Arithmetic: add <num1> <num2>, subtract <num1> <num2>, multiply <num1> <num2>, divide <num1> <num2>
+
 Statistical Calculations: mean <num1> <num2> ..., median <num1> <num2> ..., standard_deviation <num1> <num2> ...
+
 History Management: history (view command history), clear history (clear command history)
 
 ### Testing
 
 pytest
+
 pytest --pylint
+
 pytest --pylint --cov
 
 ### Contributing
