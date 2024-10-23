@@ -88,4 +88,4 @@ Contributions are welcome! Please feel free to submit a pull request or open an 
 
 ### Video Demonstration
 
-Watch the video demonstration of the calculator showcasing its key features and functionalities here.
+[Watch the video demonstration here](https://youtu.be/Rywg-xe0w9o)
